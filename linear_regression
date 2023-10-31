@@ -1,0 +1,49 @@
+import numpy as np
+
+def linear_regression(x, y):
+    n = len(x)
+    if n != len(y):
+        print("Error: X and Y are different.")
+        return None
+
+    sum_x = sum(x)
+    sum_y = sum(y)
+    sum_xy = sum(x_i * y_i for x_i, y_i in zip(x, y))
+    sum_x_squared = sum(x_i**2 for x_i in x)
+    x_mean = sum_x / n
+    y_mean = sum_y / n
+
+    a1 = (n * sum_xy - sum_x * sum_y) / (n * sum_x_squared - sum_x**2)
+    a0 = y_mean - a1 * x_mean
+
+    y_predicted = [a0 + a1 * x_i for x_i in x]
+
+    sse = sum((y_i - y_predicted_i)**2 for y_i, y_predicted_i in zip(y, y_predicted))
+    sst = sum((y_i - y_mean)**2 for y_i in y)
+    r_squared = 1 - (sse / sst)
+
+    return a0, a1, r_squared
+
+def main(input_filename, output_filename):
+    try:
+        with open(input_filename, 'r') as file:
+            lines = file.readlines()
+            x = list(map(float, lines[0].strip().split()))
+            y = list(map(float, lines[1].strip().split()))
+    except FileNotFoundError:
+        print(f"Error '{input_filename}' not found....")
+        return
+
+    coefficients = linear_regression(x, y)
+    if coefficients:
+        a0, a1, r_squared = coefficients
+        with open(output_filename, 'w') as file:
+            file.write(f"{a0} {a1}\n")
+        print(f"'{output_filename}'.")
+        print(f"(r^2): {r_squared:.4f}")
+
+if __name__ == "__main__":
+    input_filename = "input.txt" 
+    output_filename = "output.txt" 
+
+    main(input_filename, output_filename)
